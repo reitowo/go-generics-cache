@@ -235,6 +235,9 @@ func (c *Cache[K, V]) GetOrSet(key K, val V, opts ...ItemOption) (actual V, load
 
 	if !ok || item.Expired() {
 		item := newItem(key, val, opts...)
+		if item.hasExpiration() {
+			c.expManager.update(key, item.Expiration)
+		}
 		c.cache.Set(key, item)
 		return val, false
 	}
